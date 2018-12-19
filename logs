@@ -1,0 +1,4 @@
+#! /usr/bin/env python
+import logs
+
+logs.command_line_runner()

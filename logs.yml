@@ -1,0 +1,79 @@
+partner-accounts: &partner-accounts-details
+  kubernetes:
+    context: dev.cosmic.sky
+    namespace: partner-accounts
+    env: int
+    app: partner-accounts-service
+
+pa: *partner-accounts-details
+
+partner-gateway: &partner-gateway-details
+  kubernetes:
+    context: dev.cosmic.sky
+    namespace: partner-gateway
+    env: int
+    app: partner-gateway-service
+
+pg: *partner-gateway-details
+
+pm:
+  kubernetes:
+    context: dev.cosmic.sky
+    namespace: pm
+    env: int
+    app: payments-manager-service
+
+mytv-e02:
+  kubernetes:
+    context: development
+    namespace: platform
+    env:
+    app: mytv-e02
+    jq: True
+
+mytv:
+  kubernetes:
+    context: development
+    namespace: platform
+    env:
+    app: mytv-e05
+    jq: True
+
+client:
+  client
+    
+catalogue:
+  catalogue
+    
+crmg:
+  crmg
+    
+device:
+  device
+    
+nowtv-ingestor:
+  nowtv-ingestor
+    
+ningestor:
+  nowtv-ingestor
+
+personalisation:
+  personalisation
+
+my:
+  personalisation
+
+playout:
+  playout
+    
+scheduler:
+  scheduler
+    
+search:
+  search
+    
+services:
+  services
+    
+trending:
+  trending
