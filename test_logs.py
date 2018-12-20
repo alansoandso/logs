@@ -37,10 +37,11 @@ class TestLogs(TestCase):
             self.assertEqual(False, args['int'])
             self.assertEqual(False, args['quality'])
 
-    @patch('logs.legacy_logs')
-    def test_legacy_logs_routed(self, mock):
-        logs.partner_logs('legacy app', 'quality')
-        mock.assert_called_with('legacy app', 'quality')
+    @patch('sys.argv', ['', 'unknown'])
+    @patch('logs.argparse.ArgumentParser.print_help')
+    def test_cli_unknown_app(self, mock_print_help):
+        logs.command_line_runner()
+        mock_print_help.assert_called_once()
 
     @patch('logs.kubernetes_logs')
     def test_kubernetes_route(self, mock_kubernetes_logs):
@@ -51,19 +52,19 @@ class TestLogs(TestCase):
     @patch('logs.legacy_logs')
     def test_cli_services(self, mock_legacy_logs):
         logs.command_line_runner()
-        mock_legacy_logs.assert_called_with('services', None)
+        mock_legacy_logs.assert_called_with({'name': 'services', 'env': 'quality', 'jq': True}, None)
 
     @patch('sys.argv', ['', '-i', 'my'])
     @patch('logs.legacy_logs')
     def test_cli_int_alt_my(self, mock_legacy_logs):
         logs.command_line_runner()
-        mock_legacy_logs.assert_called_with('personalisation', 'int')
+        mock_legacy_logs.assert_called_with({'name': 'personalisation', 'env': 'quality', 'jq': True}, 'int')
 
     @patch('sys.argv', ['', '-q', 'my'])
     @patch('logs.legacy_logs')
     def test_cli_qa_my(self, mock_legacy_logs):
         logs.command_line_runner()
-        mock_legacy_logs.assert_called_with('personalisation', 'quality')
+        mock_legacy_logs.assert_called_with({'name': 'personalisation', 'env': 'quality', 'jq': True}, 'quality')
 
     @patch('sys.argv', ['', 'partner-accounts'])
     @patch('logs.kubernetes_logs')

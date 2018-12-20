@@ -23,14 +23,6 @@ pm:
     env: int
     app: payments-manager-service
 
-mytv-e02:
-  kubernetes:
-    context: development
-    namespace: platform
-    env:
-    app: mytv-e02
-    jq: True
-
 mytv:
   kubernetes:
     context: development
@@ -40,40 +32,79 @@ mytv:
     jq: True
 
 client:
-  client
+  legacy:
+    name: client
+    env: quality
+    jq: True
     
 catalogue:
-  catalogue
-    
+  legacy:
+    name: catalogue
+    env: quality
+    jq: False
+
 crmg:
-  crmg
-    
+  legacy:
+    name: crmg
+    env: quality
+    jq: True
+
 device:
-  device
-    
+  legacy:
+    name: device
+    env: quality
+    jq: True
+
 nowtv-ingestor:
-  nowtv-ingestor
-    
+  legacy:
+    name: nowtv-ingestor
+    env: quality
+    jq: True
+
 ningestor:
-  nowtv-ingestor
+  legacy:
+    name: nowtv-ingestor
+    env: quality
+    jq: True
 
 personalisation:
-  personalisation
+  legacy:
+    name: personalisation
+    env: quality
+    jq: True
 
 my:
-  personalisation
+  legacy:
+    name: personalisation
+    env: quality
+    jq: True
 
 playout:
-  playout
-    
+  legacy:
+    name: playout
+    env: quality
+    jq: True
+
 scheduler:
-  scheduler
-    
+  legacy:
+    name: scheduler
+    env: quality
+    jq: True
+
 search:
-  search
-    
+  legacy:
+    name: search
+    env: quality
+    jq: false
+
 services:
-  services
-    
+  legacy:
+    name: services
+    env: quality
+    jq: True
+
 trending:
-  trending
+  legacy:
+    name: trending
+    env: quality
+    jq: True

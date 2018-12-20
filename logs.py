@@ -13,24 +13,24 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 
 
 def partner_logs(app, env):
-    # For apps on Kubernetes:
-    if type(app) is str:
-        legacy_logs(app, env)
+    if app.get('legacy', None):
+        legacy_logs(app['legacy'], env)
     else:
         kubernetes_logs(app['kubernetes'], env)
 
 
 def legacy_logs(app, env):
-    # default to quality
-    if not env:
-        env = 'quality'
-
     # These environments must have your ssh public key in /home/admin/.ssh/authorized_keys
     environments = {'quality': 'qualwap01.nowtv.dev',
                     'int': 'intewap01.nowtv.dev'}
+
+    # default to quality
+    if not env or env not in environments:
+        env = 'quality'
+
     try:
         c = Connection(environments[env], user='admin')
-        c.run('tail -f /var/sky/logs/popcorn/{}.log'.format(app), pty=True)
+        c.run('tail -f /var/sky/logs/popcorn/{}.log'.format(app['name']), pty=True)
     except Exception:
         print('\nConnection closed for', environments[env])
 
@@ -96,7 +96,7 @@ def command_line_runner():
     if args['show_apps']:
         for app in apps:
             print(app)
-    elif not args['app']:
+    elif not args['app'] or args['app'] not in apps:
         parser.print_help()
     else:
         partner_logs(apps[args['app']], env)
