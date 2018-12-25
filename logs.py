@@ -3,65 +3,32 @@
 import argparse
 import logging
 import os
-import re
-from subprocess import STDOUT, check_output, CalledProcessError
 
 import yaml
-from fabric import Connection
+
+from log import KubernetesLog
+from log import LegacyLog
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 
-def partner_logs(app, env):
-    if app.get('legacy', None):
-        legacy_logs(app['legacy'], env)
-    else:
-        kubernetes_logs(app['kubernetes'], env)
+def load_config():
+    cwd = os.path.dirname(__file__)
+    with open(os.path.join(cwd, 'logs.yaml'), 'r') as f:
+        apps_yaml = yaml.load(f)
+
+    apps = {}
+    for name, config in apps_yaml.items():
+        log_class = get_class(config['class'])
+        apps[name] = log_class(name, config['app'])
+
+    return apps
 
 
-def legacy_logs(app, env):
-    # These environments must have your ssh public key in /home/admin/.ssh/authorized_keys
-    environments = {'quality': 'qualwap01.nowtv.dev',
-                    'int': 'intewap01.nowtv.dev'}
-
-    # default to quality
-    if not env or env not in environments:
-        env = 'quality'
-
-    try:
-        c = Connection(environments[env], user='admin')
-        c.run('tail -f /var/sky/logs/popcorn/{}.log'.format(app['name']), pty=True)
-    except Exception:
-        print('\nConnection closed for', environments[env])
-
-
-def kubernetes_logs(app, env):
-
-    # mytv  : _
-    if not app['env']:
-        env = ''
-    # plutus: _, -i, -c, -q
-    # None or quality supplied use default to apps preferred: _. -q
-    elif not env or env not in ['int', 'client-int']:
-        env = '-' + app['env']
-    else:
-        env = '-' + env
-
-    try:
-        pods = check_output('kubectl --context={c} -n {ns}{e} get pods'.format(c=app['context'], ns=app['namespace'], e=env).split(), universal_newlines=True, stderr=STDOUT)
-        logging.info(pods)
-
-        rgx = re.compile('(' + app['app'] + r'[^\s]+)')
-        pod = rgx.search(pods).group(1)
-        logging.info('Using this pod:{}'.format(pod))
-
-        jq = ' | jq' if app.get('jq', '') else ''
-        cmd = 'kubectl --context={c} -n {ns}{e} logs -f {p} {j}'.format(c=app['context'], ns=app['namespace'], e=env, p=pod, j=jq)
-        logging.info(cmd)
-
-        os.system(cmd)
-    except CalledProcessError:
-        print('Failed: Ensure you have signed into Osprey first with\nosprey user login')
+def get_class(log_type):
+    # Mapping of the log type to class
+    classes = {'kubernetes': KubernetesLog, 'legacy': LegacyLog}
+    return classes[log_type]  # return getattr(sys.modules[__name__], log_type)
 
 
 def get_parser():
@@ -75,9 +42,7 @@ def get_parser():
 
 
 def command_line_runner():
-    cwd = os.path.dirname(__file__)
-    with open(os.path.join(cwd, 'logs.yml'), 'r') as f:
-        apps = yaml.load(f)
+    apps = load_config()
 
     parser = get_parser()
     args = vars(parser.parse_args())
@@ -95,11 +60,11 @@ def command_line_runner():
     # Display apps for bash completion
     if args['show_apps']:
         for app in apps:
-            print(app)
+            print(app.alias)
     elif not args['app'] or args['app'] not in apps:
         parser.print_help()
     else:
-        partner_logs(apps[args['app']], env)
+        apps[args['app']].tail(env)
 
 
 if __name__ == '__main__':
