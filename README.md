@@ -7,7 +7,7 @@ Connect to application logs located on a Kubernetes or on a server
 $ logs services
 $ logs -i services
 $ logs --int partner-accounts
-$ logs --client-int pa
+$ logs --client-int partner-accounts
 ```
 
 ## Installing to the pyenv 'tools3'
@@ -31,9 +31,8 @@ pyenv deactivate
 **Development**
 
 ```
-pyenv virtualenv 3.6.0 logs
-pyenv local logs
-pip install -r requirements.txt
+pyenv local tools3
+pytest
 ```
 
 **Bash Completion**

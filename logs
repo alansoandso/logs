@@ -1,4 +1,0 @@
-#! /usr/bin/env python
-from log_tools import logs
-
-logs.command_line_runner()
