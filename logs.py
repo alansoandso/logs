@@ -60,7 +60,7 @@ def command_line_runner():
     # Display apps for bash completion
     if args['show_apps']:
         for app in apps:
-            print(app.alias)
+            print(app)
     elif not args['app'] or args['app'] not in apps:
         parser.print_help()
     else:
