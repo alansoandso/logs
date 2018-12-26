@@ -12,10 +12,10 @@ class TestLog(TestCase):
     def test_KubernetesLog(self):
         kubernetes = KubernetesLog('cmdline-name',
                                    {'app': 'partner-accounts-service', 'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int']})
-        assert (kubernetes.alias == 'cmdline-name')
-        assert (kubernetes.app == 'partner-accounts-service')
-        assert (kubernetes.envs == ['int', 'client-int'])
-        assert (kubernetes.context == 'dev.cosmic.sky')
+        assert kubernetes.alias == 'cmdline-name'
+        assert kubernetes.app == 'partner-accounts-service'
+        assert kubernetes.envs == ['int', 'client-int']
+        assert kubernetes.context == 'dev.cosmic.sky'
 
     @patch('log.check_output')
     @patch('log.os')
