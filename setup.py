@@ -10,6 +10,8 @@ setup(name='logs',
       description='Tail remote logs for Plutus apps',
       author='Alan So',
       author_email='alansoandso@gmail.com',
-      scripts=['logs', 'log.py', 'logs.py', 'logs.yaml'],
+      packages=['log_tools'],
+      package_data={'log_tools': ['logs.yaml']},
+      scripts=['logs'],
       install_requires=install_requires
       )

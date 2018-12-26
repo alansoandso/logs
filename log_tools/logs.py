@@ -6,8 +6,8 @@ import os
 
 import yaml
 
-from log_utils.log import KubernetesLog
-from log_utils.log import LegacyLog
+from log_tools.log import KubernetesLog
+from log_tools.log import LegacyLog
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
