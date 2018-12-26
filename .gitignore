@@ -1,5 +1,5 @@
 .idea/
-pretty-print-json.iml
+*.iml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
