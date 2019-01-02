@@ -7,7 +7,7 @@ partner-accounts: &partner-accounts-details
       - int
       - client-int
     app: partner-accounts-service
-    jq: True
+    jq: False
 
 pa: *partner-accounts-details
 
@@ -34,7 +34,7 @@ pm:
       - int
       - client-int
     app: payments-manager-service
-    jq: True
+    jq: False
 
 mytv:
   class: kubernetes

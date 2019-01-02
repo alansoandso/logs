@@ -19,7 +19,7 @@ class TestLog(TestCase):
     @patch('log_tools.log.check_output')
     @patch('log_tools.log.os')
     def test_KubernetesLog_tail(self, mock_os, mock_check_output):
-        kubernetes = KubernetesLog('partner-accounts', {'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int'], 'app': 'partner-accounts-service', 'jq': True})
+        kubernetes = KubernetesLog('partner-accounts', {'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int'], 'app': 'partner-accounts-service', 'jq': False})
         mock_check_output.return_value = """
         NAME                                        READY     STATUS    RESTARTS   AGE
         partner-accounts-service-me-me-me           1/1       Running   0          2h
@@ -29,20 +29,20 @@ class TestLog(TestCase):
         # use int
         kubernetes.tail('int')
         mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me | jq')
+        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me ')
         # defaults to int
         kubernetes.tail('unknown')
         mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me | jq')
+        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me ')
         # defaults to int
         kubernetes.tail('')
         mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me | jq')
+        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me ')
 
         # use client-int
         kubernetes.tail('client-int')
         mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-client-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-client-int logs -f partner-accounts-service-me-me-me | jq')
+        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-client-int logs -f partner-accounts-service-me-me-me ')
 
     @patch('log_tools.log.check_output')
     @patch('log_tools.log.os')
