@@ -12,7 +12,7 @@ from log_tools.log import LegacyLog
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 
-def load_config():
+def load_config(args):
     cwd = os.path.dirname(__file__)
     with open(os.path.join(cwd, 'logs.yaml'), 'r') as f:
         apps_yaml = yaml.load(f)
@@ -20,7 +20,7 @@ def load_config():
     apps = {}
     for name, config in apps_yaml.items():
         log_class = get_class(config['class'])
-        apps[name] = log_class(name, config['app'])
+        apps[name] = log_class(name, config['app'], args)
 
     return apps
 
@@ -35,6 +35,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description='Display logs for apps')
     parser.add_argument('app', action="store", nargs='?', help='app')
     parser.add_argument("-c", "--client_int", action="store_true", default=False, help="Client environment")
+    parser.add_argument("-d", "--dry_run", action="store_true", default=False, help="Dry run to show commands")
     parser.add_argument("-i", "--int", action="store_true", default=False, help="Integration environment")
     parser.add_argument("-j", "--show_apps", action="store_true", default=False, help="Display valid apps")
     parser.add_argument("-q", "--quality", action="store_true", default=False, help="Quality environment")
@@ -42,10 +43,10 @@ def get_parser():
 
 
 def command_line_runner():
-    apps = load_config()
-
     parser = get_parser()
     args = vars(parser.parse_args())
+
+    apps = load_config(args)
 
     # Only explicitly set the env if provided
     if args['int']:

@@ -74,3 +74,9 @@ class TestLogs(TestCase):
         logs.command_line_runner()
         mock_kubernetes_logs.assert_called_once()
         mock_kubernetes_logs.assert_called_once_with('int')
+
+    @patch('sys.argv', ['', '-d', 'pa'])
+    @patch('log_tools.log.KubernetesLog.tail')
+    def test_cli_dry_kube(self, mock_kubernetes_logs):
+        logs.command_line_runner()
+        mock_kubernetes_logs.assert_called_once()

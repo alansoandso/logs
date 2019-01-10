@@ -36,6 +36,17 @@ pm:
     app: payments-manager-service
     jq: False
 
+shmac-generator: &shmac-generator-details
+  class: kubernetes
+  app:
+    context: dev.cosmic.sky
+    namespace: shmac-generator
+    envs:
+      - int
+      - client-int
+    app: shmac-generator-service
+    jq: True
+
 mytv:
   class: kubernetes
   app:
@@ -52,8 +63,7 @@ client:
     envs:
       - quality
       - int
-    jq: True
-    
+
 catalogue:
   class: legacy
   app:
@@ -61,7 +71,6 @@ catalogue:
     envs:
       - quality
       - int
-    jq: False
 
 crmg:
   class: legacy
@@ -70,7 +79,6 @@ crmg:
     envs:
       - quality
       - int
-    jq: True
 
 device:
   class: legacy
@@ -79,7 +87,6 @@ device:
     envs:
       - quality
       - int
-    jq: True
 
 nowtv-ingestor:
   class: legacy
@@ -88,7 +95,6 @@ nowtv-ingestor:
     envs:
       - quality
       - int
-    jq: True
 
 ningestor:
   class: legacy
@@ -97,7 +103,6 @@ ningestor:
     envs:
       - quality
       - int
-    jq: True
 
 personalisation: &personalisation-details
   class: legacy
@@ -106,7 +111,6 @@ personalisation: &personalisation-details
     envs:
       - quality
       - int
-    jq: True
 
 my: *personalisation-details
 
@@ -117,7 +121,6 @@ playout:
     envs:
       - quality
       - int
-    jq: True
 
 scheduler:
   class: legacy
@@ -126,7 +129,6 @@ scheduler:
     envs:
       - quality
       - int
-    jq: True
 
 search:
   class: legacy
@@ -135,7 +137,6 @@ search:
     envs:
       - quality
       - int
-    jq: false
 
 services:
   class: legacy
@@ -144,7 +145,6 @@ services:
     envs:
       - quality
       - int
-    jq: True
 
 trending:
   class: legacy
@@ -152,4 +152,3 @@ trending:
     app: trending
     envs:
       - quality
-    jq: True

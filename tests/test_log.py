@@ -10,16 +10,17 @@ class TestLog(TestCase):
         pass
 
     def test_KubernetesLog(self):
-        kubernetes = KubernetesLog('cmdline-name', {'app': 'partner-accounts-service', 'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int']})
+        kubernetes = KubernetesLog('cmdline-name', {'app': 'partner-accounts-service', 'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int']}, {'dry_run': True})
         assert kubernetes.alias == 'cmdline-name'
         assert kubernetes.app == 'partner-accounts-service'
         assert kubernetes.envs == ['int', 'client-int']
         assert kubernetes.context == 'dev.cosmic.sky'
+        assert kubernetes.dryrun
 
     @patch('log_tools.log.check_output')
     @patch('log_tools.log.os')
     def test_KubernetesLog_tail(self, mock_os, mock_check_output):
-        kubernetes = KubernetesLog('partner-accounts', {'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int'], 'app': 'partner-accounts-service', 'jq': False})
+        kubernetes = KubernetesLog('partner-accounts', {'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int'], 'app': 'partner-accounts-service', 'jq': False}, {})
         mock_check_output.return_value = """
         NAME                                        READY     STATUS    RESTARTS   AGE
         partner-accounts-service-me-me-me           1/1       Running   0          2h
@@ -47,7 +48,7 @@ class TestLog(TestCase):
     @patch('log_tools.log.check_output')
     @patch('log_tools.log.os')
     def test_Kubernetes_logs_mytv_logs(self, mock_os, mock_check_output):
-        kubernetes = KubernetesLog('mytv', {'context': 'development', 'namespace': 'platform', 'envs': None, 'app': 'mytv-e05', 'jq': True})
+        kubernetes = KubernetesLog('mytv', {'context': 'development', 'namespace': 'platform', 'envs': None, 'app': 'mytv-e05', 'jq': True}, {})
         mock_check_output.return_value = """
         NAME                                READY     STATUS    RESTARTS   AGE
         mytv-e05-pickme                     1/1       Running   0          35d
@@ -58,13 +59,13 @@ class TestLog(TestCase):
         mock_os.system.assert_called_with('kubectl --context=development -n platform logs -f mytv-e05-pickme | jq')
 
     def test_LegacyLog(self):
-        legacy = LegacyLog('cmdline-name', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True})
-        assert (legacy.alias == 'cmdline-name')
-        assert (legacy.app == 'services')
+        legacy = LegacyLog('cmdline-name', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True}, {})
+        assert legacy.alias == 'cmdline-name'
+        assert legacy.app == 'services'
 
     @patch('log_tools.log.Connection')
     def test_LegacyLog_tail(self, mock_connection):
-        legacy = LegacyLog('services', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True})
+        legacy = LegacyLog('services', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True}, {})
         # mock_connection.return_value = dict(host='qualwap01.nowtv.dev', user='admin')
         # use quality
         legacy.tail('quality')
@@ -81,6 +82,12 @@ class TestLog(TestCase):
 
     @patch('log_tools.log.Connection.run')
     def test_LegacyLog_tail_run(self, mock_run):
-        legacy = LegacyLog('services', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True})
+        legacy = LegacyLog('services', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True}, {})
         legacy.tail('quality')
         mock_run.assert_called_with('tail -f /var/sky/logs/popcorn/services.log', pty=True)
+
+    @patch('log_tools.log.print')
+    def test_LegacyLog_tail_dry_run(self, mock_print):
+        legacy = LegacyLog('services', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True}, {'dry_run': True})
+        legacy.tail('quality')
+        mock_print.assert_called_once()
