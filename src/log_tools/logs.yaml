@@ -7,7 +7,7 @@ partner-accounts: &partner-accounts-details
       - int
       - client-int
     app: partner-accounts-service
-    jq: False
+    jq: --jq ".message"
 
 pa: *partner-accounts-details
 
@@ -20,8 +20,6 @@ partner-gateway: &partner-gateway-details
       - int
       - client-int
     app: partner-gateway-service
-    jq: False
-
 
 pg: *partner-gateway-details
 
@@ -34,7 +32,7 @@ pm:
       - int
       - client-int
     app: payments-manager-service
-    jq: False
+    jq: --jq ".message"
 
 shmac-generator: &shmac-generator-details
   class: kubernetes
@@ -45,7 +43,9 @@ shmac-generator: &shmac-generator-details
       - int
       - client-int
     app: shmac-generator-service
-    jq: True
+    jq: --jq ".message,.headers//empty"
+
+shmac: *shmac-generator-details
 
 mytv:
   class: kubernetes
@@ -54,7 +54,33 @@ mytv:
     namespace: platform
     envs:
     app: mytv-e05
-    jq: True
+    jq: --jq ".message"
+
+partner-purchases-gateway: &ppg-details
+  class: kubernetes
+  app:
+    context: dev.cosmic.sky
+    namespace: ott-ppg
+    envs:
+      - int
+      - client-int
+    app: partner-purchases-gateway-service
+    jq: --jq ".message"
+
+ppg: *ppg-details
+
+itunes-adapter: &ia-details
+  class: kubernetes
+  app:
+    context: dev.cosmic.sky
+    namespace: ott-ia
+    envs:
+      - int
+      - client-int
+    app: itunes-adapter-service
+    jq: --jq ".message,.headers//empty"
+
+itunes: *ia-details
 
 client:
   class: legacy

@@ -10,6 +10,14 @@ $ logs --int partner-accounts
 $ logs --client-int partner-accounts
 ```
 
+## Dependencies
+- Python3
+- Pyenv
+- jq
+- kubetail
+- bash complete
+- ssh keys
+
 ## Installing to the pyenv 'tools3'
 
 **Installation**
@@ -18,6 +26,9 @@ $ logs --client-int partner-accounts
 pyenv activate tools3
 pip install .
 pyenv deactivate
+
+# or use the script:
+reinstall
 ```
 
 **Uninstalling**

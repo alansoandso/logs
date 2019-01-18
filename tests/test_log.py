@@ -17,46 +17,29 @@ class TestLog(TestCase):
         assert kubernetes.context == 'dev.cosmic.sky'
         assert kubernetes.dryrun
 
-    @patch('log_tools.log.check_output')
     @patch('log_tools.log.os')
-    def test_KubernetesLog_tail(self, mock_os, mock_check_output):
+    def test_KubernetesLog_tail(self, mock_os):
         kubernetes = KubernetesLog('partner-accounts', {'context': 'dev.cosmic.sky', 'namespace': 'partner-accounts', 'envs': ['int', 'client-int'], 'app': 'partner-accounts-service', 'jq': False}, {})
-        mock_check_output.return_value = """
-        NAME                                        READY     STATUS    RESTARTS   AGE
-        partner-accounts-service-me-me-me           1/1       Running   0          2h
-        partner-accounts-service-75f66cc6f6-sw62w   1/1       Running   0          2h
-        """
 
         # use int
         kubernetes.tail('int')
-        mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f ')
         # defaults to int
         kubernetes.tail('unknown')
-        mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f ')
         # defaults to int
         kubernetes.tail('')
-        mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-int logs -f partner-accounts-service-me-me-me ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f ')
 
         # use client-int
         kubernetes.tail('client-int')
-        mock_check_output.assert_called_with(['kubectl', '--context=dev.cosmic.sky', '-n', 'partner-accounts-client-int', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=dev.cosmic.sky -n partner-accounts-client-int logs -f partner-accounts-service-me-me-me ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-client-int -f ')
 
-    @patch('log_tools.log.check_output')
     @patch('log_tools.log.os')
-    def test_Kubernetes_logs_mytv_logs(self, mock_os, mock_check_output):
-        kubernetes = KubernetesLog('mytv', {'context': 'development', 'namespace': 'platform', 'envs': None, 'app': 'mytv-e05', 'jq': True}, {})
-        mock_check_output.return_value = """
-        NAME                                READY     STATUS    RESTARTS   AGE
-        mytv-e05-pickme                     1/1       Running   0          35d
-        prometheus-stack-3169584513-0jk3j   2/2       Running   0          103d
-        """
+    def test_Kubernetes_logs_mytv_logs(self, mock_os):
+        kubernetes = KubernetesLog('mytv', {'context': 'development', 'namespace': 'platform', 'envs': None, 'app': 'mytv-e05', 'jq': '--jq ".message"'}, {'messages': True})
         kubernetes.tail(None)
-        mock_check_output.assert_called_with(['kubectl', '--context=development', '-n', 'platform', 'get', 'pods'], stderr=-2, universal_newlines=True)
-        mock_os.system.assert_called_with('kubectl --context=development -n platform logs -f mytv-e05-pickme | jq')
+        mock_os.system.assert_called_with('kubetail mytv-e05 -t development -n platform -f --jq ".message"')
 
     def test_LegacyLog(self):
         legacy = LegacyLog('cmdline-name', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True}, {})

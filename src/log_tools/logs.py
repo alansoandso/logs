@@ -38,6 +38,7 @@ def get_parser():
     parser.add_argument("-d", "--dry_run", action="store_true", default=False, help="Dry run to show commands")
     parser.add_argument("-i", "--int", action="store_true", default=False, help="Integration environment")
     parser.add_argument("-j", "--show_apps", action="store_true", default=False, help="Display valid apps")
+    parser.add_argument("-m", "--messages", action="store_true", default=False, help="Output only messages with jq")
     parser.add_argument("-q", "--quality", action="store_true", default=False, help="Quality environment")
     return parser
 
