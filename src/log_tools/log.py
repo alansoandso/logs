@@ -1,8 +1,6 @@
 import abc
 import logging
 import os
-import re
-from subprocess import STDOUT, check_output, CalledProcessError
 
 from fabric import Connection
 
@@ -35,12 +33,17 @@ class Log(object):
     def dryrun(self):
         return self.args.get('dry_run', False)
 
+    @property
+    def filter(self):
+        return self.args.get('messages', False)
+
 
 class KubernetesLog(Log):
     """
     Application on Kubernetes,
     Selected by namespace + env
     """
+
     def __init__(self, alias, attributes, cli_arguments):
         self.context = ''
         self.namespace = ''
@@ -52,7 +55,8 @@ class KubernetesLog(Log):
 
     def tail(self, env):
         # mytv  : _
-        if not self.envs: env = ''
+        if not self.envs:
+            env = ''
 
         # plutus: _, -i, -c, -q
 
@@ -62,32 +66,17 @@ class KubernetesLog(Log):
         else:
             env = '-' + env
 
-        cmd = 'kubectl --context={c} -n {ns}{e} get pods'.format(c=self.context, ns=self.namespace, e=env)
+        jq = self.jq if self.jq and self.filter else ''
+        cmd = 'kubetail {a} -t {c} -n {ns}{e} -f {j}'.format(c=self.context, ns=self.namespace, e=env, a=self.app, j=jq)
 
-        try:
-            if self.dryrun:
-                print(cmd)
-            else:
-                logging.info(cmd)
-                pods = check_output(cmd.split(), universal_newlines=True, stderr=STDOUT)
-                logging.info(pods)
-
-                rgx = re.compile('(' + self.app + r'[^\s]+)')
-                pod = rgx.search(pods).group(1)
-                logging.info('Using this pod:{}'.format(pod))
-
-                jq = '| jq' if self.jq else ''
-
-                cmd = 'kubectl --context={c} -n {ns}{e} logs -f {p} {j}'.format(c=self.context, ns=self.namespace, e=env, p=pod, j=jq)
-
-                logging.info(cmd)
-                os.system(cmd)
-
-        except FileNotFoundError:
-            print('FileNotFoundError: ', cmd)
-
-        except CalledProcessError:
-            print('Failed: Ensure you have signed into Osprey first with\nosprey user login')
+        if self.dryrun:
+            print('Dry run: {}'.format(cmd))
+        else:
+            logging.info(cmd)
+            # Run command until terminated with SIGTERM
+            os.system(cmd)
+            # Self terminated must be an error
+            print('\nFailed: Ensure you have signed into Osprey first with\nosprey user login')
 
 
 class LegacyLog(Log):
@@ -113,10 +102,12 @@ class LegacyLog(Log):
         cmd = 'tail -f /var/sky/logs/popcorn/{}.log'.format(self.app)
 
         if self.dryrun:
-            print(cmd)
+            print('Dry run: {}'.format(cmd))
         else:
             logging.info(cmd)
+
             try:
+                # Run command remotely
                 c = Connection(environments[env], user='admin')
                 c.run(cmd, pty=True)
             except Exception:
