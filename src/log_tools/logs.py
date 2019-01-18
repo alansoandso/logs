@@ -33,13 +33,14 @@ def get_class(log_type):
 
 def get_parser():
     parser = argparse.ArgumentParser(description='Display logs for apps')
-    parser.add_argument('app', action="store", nargs='?', help='app')
-    parser.add_argument("-c", "--client_int", action="store_true", default=False, help="Client environment")
-    parser.add_argument("-d", "--dry_run", action="store_true", default=False, help="Dry run to show commands")
-    parser.add_argument("-i", "--int", action="store_true", default=False, help="Integration environment")
-    parser.add_argument("-j", "--show_apps", action="store_true", default=False, help="Display valid apps")
-    parser.add_argument("-m", "--messages", action="store_true", default=False, help="Output only messages with jq")
-    parser.add_argument("-q", "--quality", action="store_true", default=False, help="Quality environment")
+    parser.add_argument('app', action='store', nargs='?', help='app')
+    parser.add_argument('-c', '--client_int', action='store_true', default=False, help='Client environment')
+    parser.add_argument('-d', '--dry_run', action='store_true', default=False, help='Dry run to show commands')
+    parser.add_argument('-i', '--int', action='store_true', default=False, help='Integration environment')
+    parser.add_argument('-j', '--show_apps', action='store_true', default=False, help='Display valid apps')
+    parser.add_argument('-m', dest='messages', action='store_false', default=True, help='Output no messages with jq')
+    parser.add_argument('-s', action='store', dest='since', help='kubetail output since')
+    parser.add_argument('-q', '--quality', action='store_true', default=False, help='Quality environment')
     return parser
 
 

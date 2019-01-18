@@ -23,23 +23,35 @@ class TestLog(TestCase):
 
         # use int
         kubernetes.tail('int')
-        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f')
         # defaults to int
         kubernetes.tail('unknown')
-        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f')
         # defaults to int
         kubernetes.tail('')
-        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-int -f')
 
         # use client-int
         kubernetes.tail('client-int')
-        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-client-int -f ')
+        mock_os.system.assert_called_with('kubetail partner-accounts-service -t dev.cosmic.sky -n partner-accounts-client-int -f')
 
     @patch('log_tools.log.os')
-    def test_Kubernetes_logs_mytv_logs(self, mock_os):
+    def test_Kubetail_no_jq_logs(self, mock_os):
+        kubernetes = KubernetesLog('mytv', {'context': 'development', 'namespace': 'platform', 'envs': None, 'app': 'mytv-e05', 'jq': '--jq ".message"'}, {'messages': False})
+        kubernetes.tail(None)
+        mock_os.system.assert_called_with('kubetail mytv-e05 -t development -n platform -f')
+
+    @patch('log_tools.log.os')
+    def test_Kubetail_with_jq_logs(self, mock_os):
         kubernetes = KubernetesLog('mytv', {'context': 'development', 'namespace': 'platform', 'envs': None, 'app': 'mytv-e05', 'jq': '--jq ".message"'}, {'messages': True})
         kubernetes.tail(None)
-        mock_os.system.assert_called_with('kubetail mytv-e05 -t development -n platform -f --jq ".message"')
+        mock_os.system.assert_called_with('kubetail mytv-e05 -t development -n platform --jq ".message" -f')
+
+    @patch('log_tools.log.os')
+    def test_Kubetail_since_logs(self, mock_os):
+        kubernetes = KubernetesLog('mytv', {'context': 'development', 'namespace': 'platform', 'envs': None, 'app': 'mytv-e05', 'jq': '--jq ".message"'}, {'messages': True, 'since': '10m'})
+        kubernetes.tail(None)
+        mock_os.system.assert_called_with('kubetail mytv-e05 -t development -n platform -s 10m --jq ".message" -f')
 
     def test_LegacyLog(self):
         legacy = LegacyLog('cmdline-name', {'app': 'services', 'envs': ['quality', 'int'], 'jq': True}, {})

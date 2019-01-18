@@ -37,6 +37,10 @@ class Log(object):
     def filter(self):
         return self.args.get('messages', False)
 
+    @property
+    def since(self):
+        return self.args.get('since', False)
+
 
 class KubernetesLog(Log):
     """
@@ -66,8 +70,9 @@ class KubernetesLog(Log):
         else:
             env = '-' + env
 
-        jq = self.jq if self.jq and self.filter else ''
-        cmd = 'kubetail {a} -t {c} -n {ns}{e} -f {j}'.format(c=self.context, ns=self.namespace, e=env, a=self.app, j=jq)
+        jq = ' ' + self.jq if self.jq and self.filter else ''
+        since = ' -s {}'.format(self.since) if self.since else ''
+        cmd = 'kubetail {a} -t {c} -n {ns}{e}{s}{j} -f'.format(c=self.context, ns=self.namespace, e=env, a=self.app, s=since, j=jq)
 
         if self.dryrun:
             print('Dry run: {}'.format(cmd))
