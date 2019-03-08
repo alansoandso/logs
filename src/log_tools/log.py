@@ -72,14 +72,15 @@ class KubernetesLog(Log):
 
         jq = ' ' + self.jq if self.jq and self.filter else ''
         since = ' -s {}'.format(self.since) if self.since else ''
-        cmd = 'kubetail {a} -t {c} -n {ns}{e}{s}{j} -f'.format(c=self.context, ns=self.namespace, e=env, a=self.app, s=since, j=jq)
+        kubetail_cmd = 'kubetail {a} -t {c} -n {ns}{e}{s}{j} -f'.format(c=self.context, ns=self.namespace, e=env, a=self.app, s=since, j=jq)
+        kubectl_cmd = 'kubectl --context={c} --namespace={ns}{e} get pods'.format(c=self.context, ns=self.namespace, e=env)
 
         if self.dryrun:
-            print('Dry run: {}'.format(cmd))
+            print('Dry run:\n{}\n{}'.format(kubectl_cmd, kubetail_cmd))
         else:
-            logging.info(cmd)
+            logging.info(kubetail_cmd)
             # Run command until terminated with SIGTERM
-            os.system(cmd)
+            os.system(kubetail_cmd)
             # Self terminated must be an error
             print('\nFailed: Ensure you have signed into Osprey first with\nosprey user login')
 
@@ -104,10 +105,11 @@ class LegacyLog(Log):
         if not env or env not in environments:
             env = self.envs[0]
 
+        ssh_cmd = 'ssh admin@{}'.format(environments[env])
         cmd = 'tail -f /var/sky/logs/popcorn/{}.log'.format(self.app)
 
         if self.dryrun:
-            print('Dry run: {}'.format(cmd))
+            print('Dry run:\n{}\n{}'.format(ssh_cmd, cmd))
         else:
             logging.info(cmd)
 
