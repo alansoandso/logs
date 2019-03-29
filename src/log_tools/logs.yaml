@@ -114,6 +114,13 @@ device:
       - quality
       - int
 
+gifting:
+  class: legacy
+  app:
+    app: gifting
+    envs:
+      - gift
+
 nowtv-ingestor:
   class: legacy
   app:
