@@ -72,8 +72,10 @@ class KubernetesLog(Log):
 
         jq = ' ' + self.jq if self.jq and self.filter else ''
         since = ' -s {}'.format(self.since) if self.since else ''
-        kubetail_cmd = 'kubetail {a} -t {c} -n {ns}{e}{s}{j} -f'.format(c=self.context, ns=self.namespace, e=env, a=self.app, s=since, j=jq)
-        kubectl_cmd = 'kubectl --context={c} --namespace={ns}{e} get pods'.format(c=self.context, ns=self.namespace, e=env)
+        kubetail_cmd = 'kubetail --skip-colors 4,8 {a} -t {c} -n {ns}{e}{s}{j} -f'.\
+            format(c=self.context, ns=self.namespace, e=env, a=self.app, s=since, j=jq)
+        kubectl_cmd = 'kubectl --context={c} --namespace={ns}{e} get pods'.\
+            format(c=self.context, ns=self.namespace, e=env)
 
         if self.dryrun:
             print('Dry run:\n{}\n{}'.format(kubectl_cmd, kubetail_cmd))
@@ -99,7 +101,9 @@ class LegacyLog(Log):
 
     def tail(self, env):
         # These environments must have your ssh public key in /home/admin/.ssh/authorized_keys
-        environments = {'quality': 'qualwap01.nowtv.dev', 'int': 'intewap01.nowtv.dev', 'gift': 'devgftwap01.nowtv.bskyb.com'}
+        environments = {'quality': 'qualwap01.nowtv.dev',
+                        'int': 'intewap01.nowtv.dev',
+                        'gift': 'devgftwap01.nowtv.bskyb.com'}
 
         # use default
         if not env or env not in environments:
