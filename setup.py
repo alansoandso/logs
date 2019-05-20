@@ -11,7 +11,7 @@ from setuptools import setup
 
 install_requires = [
     'fabric==2.4.0',
-    'PyYAML==3.13',
+    'PyYAML',
     'pytest==4.0.2'
 ]
 

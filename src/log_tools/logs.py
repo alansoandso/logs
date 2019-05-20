@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(mess
 def load_config(args):
     cwd = os.path.dirname(__file__)
     with open(os.path.join(cwd, 'logs.yaml'), 'r') as f:
-        apps_yaml = yaml.load(f)
+        apps_yaml = yaml.load(f, Loader=yaml.BaseLoader)
 
     apps = {}
     for name, config in apps_yaml.items():
