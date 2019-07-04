@@ -103,7 +103,8 @@ class LegacyLog(Log):
         # These environments must have your ssh public key in /home/admin/.ssh/authorized_keys
         environments = {'quality': 'qualwap01.nowtv.dev',
                         'int': 'intewap01.nowtv.dev',
-                        'gift': 'devgftwap01.nowtv.bskyb.com'}
+                        'gift': 'devgftwap01.nowtv.bskyb.com',
+                        'gift_int': 'intgftwap01.nowtv.bskyb.com'}
 
         # use default
         if not env or env not in environments:

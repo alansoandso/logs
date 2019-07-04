@@ -36,6 +36,7 @@ def get_parser():
     parser.add_argument('app', action='store', nargs='?', help='app')
     parser.add_argument('-c', '--client_int', action='store_true', default=False, help='Client environment')
     parser.add_argument('-d', '--dry_run', action='store_true', default=False, help='Dry run to show commands')
+    parser.add_argument('-g', '--gift_int', action='store_true', default=False, help='Gifting Integration environment')
     parser.add_argument('-i', '--int', action='store_true', default=False, help='Integration environment')
     parser.add_argument('-j', '--show_apps', action='store_true', default=False, help='Display valid apps')
     parser.add_argument('-m', dest='messages', action='store_false', default=True, help='Output no messages with jq')
@@ -57,6 +58,8 @@ def command_line_runner():
         env = 'client-int'
     elif args['quality']:
         env = 'quality'
+    elif args['gift_int']:
+        env = 'gift_int'
     else:
         env = None
 

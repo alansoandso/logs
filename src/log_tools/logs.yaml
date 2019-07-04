@@ -50,7 +50,7 @@ shmac: *shmac-generator-details
 mytv:
   class: kubernetes
   app:
-    context: development
+    context: nowtv.dev
     namespace: platform
     envs:
     app: mytv-e05
@@ -120,6 +120,7 @@ gifting:
     app: gifting
     envs:
       - gift
+      - gift_int
 
 nowtv-ingestor:
   class: legacy
