@@ -10,9 +10,8 @@ from setuptools import find_packages
 from setuptools import setup
 
 install_requires = [
-    'fabric==2.4.0',
-    'PyYAML',
-    'pytest==4.0.2'
+    'fabric>=2.4.0',
+    'PyYAML'
 ]
 
 setup(name='logs',
